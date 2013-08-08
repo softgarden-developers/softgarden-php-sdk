@@ -157,7 +157,7 @@ abstract class BaseSoftgarden {
 	 *
 	 * @var string
 	 */
-	protected $accessToken = null;
+	protected $accessToken = NULL;
 
 	/**
 	 * Indicates if the CURL based @ syntax for file uploads is enabled.
@@ -343,7 +343,7 @@ abstract class BaseSoftgarden {
 	 * @return string The access token
 	 */
 	public function getAccessToken() {
-		if ($this->accessToken !== null) {
+		if ($this->accessToken !== NULL) {
 			// we've done this already and cached it.  Just return.
 			return $this->accessToken;
 		}
@@ -400,7 +400,7 @@ abstract class BaseSoftgarden {
 	 *                public information about users and applications.
 	 */
 	protected function getApplicationAccessToken() {
-		return null; // $this->appId.'|'.$this->appSecret;
+		return NULL; // $this->appId.'|'.$this->appSecret;
 	}
 	
 	/**
@@ -413,12 +413,12 @@ abstract class BaseSoftgarden {
 	 */
 	protected function getCode() {
 		if (isset($_REQUEST['code'])) {
-			if ($this->state !== null &&
+			if ($this->state !== NULL &&
 			isset($_REQUEST['state']) &&
 			$this->state === $_REQUEST['state']) {
 
 				// CSRF state has done its job, so clear it
-				$this->state = null;
+				$this->state = NULL;
 				$this->clearPersistentData('state');
 				return $_REQUEST['code'];
 			} else {
@@ -437,7 +437,7 @@ abstract class BaseSoftgarden {
 	 * @return string the UID if available.
 	 */
 // 	public function getUser() {
-// 		if ($this->user !== null) {
+// 		if ($this->user !== NULL) {
 // 			// we've already determined this and cached the value.
 // 			return $this->user;
 // 		}
@@ -521,7 +521,7 @@ abstract class BaseSoftgarden {
 	 * @return void
 	 */
 	protected function establishCSRFTokenState() {
-		if ($this->state === null) {
+		if ($this->state === NULL) {
 			$this->state = md5(uniqid(mt_rand(), true));
 			$this->setPersistentData('state', $this->state);
 		}
@@ -539,12 +539,12 @@ abstract class BaseSoftgarden {
 	 * @return mixed An access token exchanged for the authorization code, or
 	 *               false if an access token could not be generated.
 	 */
-	protected function getAccessTokenFromCode($code, $redirect_uri = null) {
+	protected function getAccessTokenFromCode($code, $redirect_uri = NULL) {
 		if (empty($code)) {
 			return false;
 		}
 
-		if ($redirect_uri === null) {
+		if ($redirect_uri === NULL) {
 			$redirect_uri = $this->getCurrentUrl();
 		}
 
@@ -599,7 +599,7 @@ abstract class BaseSoftgarden {
 	 *
 	 * @return string The URL for the given parameters
 	 */
-	protected function getUrl($path='', $params=array()) {
+	protected function getUrl($path='', $params = NULL) {
 		$url = $this->getApiBaseUrl() . '/';
 		if ($path) {
 			if ($path[0] === '/') {
@@ -607,8 +607,10 @@ abstract class BaseSoftgarden {
 			}
 			$url .= $path;
 		}
-		if ($params) {
-			$url .= '?' . http_build_query($params, null, '&');
+		if (is_array($params) && !empty($params)) {
+			$url .= 
+				(strpos($url, '?') === false ? '?' : '&')
+				. http_build_query($params, NULL, '&');
 		}
 
 		return $url;
@@ -625,7 +627,7 @@ abstract class BaseSoftgarden {
 	 *
 	 * @return string The response text
 	 */
-	protected function makeRequest($url, $params, $method = 'GET', $accessToken = null, $returnHeader = 0) {
+	protected function makeRequest($url, $params, $method = 'GET', $accessToken = NULL, $returnHeader = 0) {
 		$ch = curl_init();
 
 		$opts = self::$CURL_OPTS;
@@ -661,7 +663,7 @@ abstract class BaseSoftgarden {
 			if ($this->getFileUploadSupport()) {
 				$opts[CURLOPT_POSTFIELDS] = $params;
 			} else {
-				$opts[CURLOPT_POSTFIELDS] = http_build_query($params, null, '&');
+				$opts[CURLOPT_POSTFIELDS] = http_build_query($params, NULL, '&');
 			}
 			
 		} else if ($method == "JSONPOST") {
@@ -684,12 +686,12 @@ abstract class BaseSoftgarden {
 		// GET is curl's default
 		
 		
-		if ($accessToken != null) {
+		if ($accessToken !== NULL) {
 			$headers[] = "Authorization: Bearer $accessToken";
 		
-		} else if ($this->appId != null) {
+		} else if ($this->appId !== NULL) {
 			curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC ) ;
-			curl_setopt($ch, CURLOPT_USERPWD, $this->appId . ($this->appSecret != null ? ':' . $this->appSecret : '') );
+			curl_setopt($ch, CURLOPT_USERPWD, $this->appId . ($this->appSecret !== NULL ? ':' . $this->appSecret : '') );
 		}
 		
 		// and set all headers to curl
@@ -807,19 +809,19 @@ abstract class BaseSoftgarden {
 		return true;
 	}
 	
-	public function put($url, $data = null, $accessToken = null) {
+	public function put($url, $data = NULL, $accessToken = null) {
 		return $this->api($url, $data, 'PUT', $accessToken);
 	}
 	
-	public function post($url, $data = null, $accessToken = null) {
+	public function post($url, $data = NULL, $accessToken = null) {
 		return $this->api($url, $data, 'JSONPOST', $accessToken);
 	}
 	
-	public function get($url, $data = null, $accessToken = null) {
+	public function get($url, $data = NULL, $accessToken = null) {
 		return $this->api($url, $data, 'GET', $accessToken);
 	}
 	
-	public function delete($url, $data = null, $accessToken = null) {
+	public function delete($url, $data = NULL, $accessToken = null) {
 		return $this->api($url, $data, 'DELETE', $accessToken);
 	}
 	
@@ -834,10 +836,13 @@ abstract class BaseSoftgarden {
 	 * @return mixed The decoded response object
 	 * @throws SoftgardenApiException
 	 */
-	public function api($path, $params = array(), $method = 'GET', $accessToken = null, $returnHeader = 0) {
+	public function api($path, $params = NULL, $method = 'GET', $accessToken = null, $returnHeader = 0) {
+		$paramsAsQueryString = $method == 'GET' || $method == 'DELETE';
+		$url = $this->getUrl($path, $paramsAsQueryString ? $params : NULL);
+		
 		$result = $this->jsonDecode(
 				$this->makeRequest(
-						$this->getUrl($path),
+						$url,
 						$params,
 						$method,
 						$accessToken == null ? $this->getAccessToken() : $accessToken,
@@ -919,8 +924,8 @@ abstract class BaseSoftgarden {
 	 * Destroy the current session
 	 */
 	public function destroySession() {
-		$this->accessToken = null;
-		//$this->user = null;
+		$this->accessToken = NULL;
+		//$this->user = NULL;
 		$this->clearAllPersistentData();
 	}
 	
