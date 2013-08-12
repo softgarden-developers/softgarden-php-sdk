@@ -667,6 +667,7 @@ abstract class BaseSoftgarden {
 			}
 			
 		} else if ($method == "JSONPOST") {
+			$params = is_array($params) && empty($params) ? NULL : $params;
 			$json = json_encode($params);
 			$opts[CURLOPT_POSTFIELDS] = $json;
 			$opts[CURLOPT_CUSTOMREQUEST] = "POST";
@@ -674,6 +675,7 @@ abstract class BaseSoftgarden {
 			$headers[] = "Content-Length: " . strlen($json);
 		
 		} else if ($method == "PUT") {
+			$params = is_array($params) && empty($params) ? NULL : $params;
 			$json = json_encode($params);
 			$opts[CURLOPT_POSTFIELDS] = $json;
 			$opts[CURLOPT_CUSTOMREQUEST] = "PUT";
