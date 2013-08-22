@@ -1,0 +1,89 @@
+softgarden PHP SDK
+==================
+
+The [softgarden-cloud API](http://dev.softgarden.de/) is
+a set of APIs that connect your app to the softgarden cloud ATS.
+
+This repository contains the open source PHP SDK that allows you to
+access softgarden cloud API from your PHP app. Except as otherwise noted,
+the softgarden PHP SDK is licensed under the Apache Licence, Version 2.0
+(http://www.apache.org/licenses/LICENSE-2.0.html).
+
+
+Usage
+-----
+
+The [examples][examples] are a good place to start. The minimal you'll need to
+have is:
+
+    require 'softgarden-php-sdk/src/Softgarden.php';
+
+    $softgarden = new Softgarden(array(
+      'appId'  => 'YOUR_APP_ID',
+      'secret' => 'YOUR_APP_SECRET' // only required if your app has an secret
+    ));
+
+    // call an API endpoint
+    $response = $softgarden->get('v2/frontend/me');
+
+To make [API][API] calls, the general pattern is:
+
+      try {
+        // make the api call, generic
+        $response = $softgarden->api('v2/frontend/me');
+
+        // make the api call, get
+        $response = $softgarden->get('v2/frontend/me', $optionalQueryParamsAsArray);
+
+        // make the api call, post
+        $response = $softgarden->post('v2/frontend/me', $optionalPostParamsAsArray);
+
+        // make the api call, put
+        $response = $softgarden->put('v2/frontend/me', $optionalPostParamsAsArray);
+
+        // make the api call, delete
+        $response = $softgarden->delete('v2/frontend/me', $optionalQueryParamsAsArray);
+
+      } catch (SoftgardenApiException $e) {
+        error_log($e);
+      }
+    }
+
+[examples]: http://github.com/softgarden/softgarden-php-sdk/blob/master/examples/example.php
+[API]: http://dev.softgarden.de
+
+
+Tests
+-----
+
+In order to keep us nimble and allow us to bring you new functionality, without
+compromising on stability, we have ensured full test coverage of the SDK.
+We are including this in the open source repository to assure you of our
+commitment to quality, but also with the hopes that you will contribute back to
+help keep it stable. The easiest way to do so is to file bugs and include a
+test case.
+
+The tests can be executed by using this command from the base directory:
+
+    phpunit --stderr --bootstrap tests/bootstrap.php tests/tests.php
+
+
+Contributing
+===========
+For us to accept contributions you will have to first have signed the
+[Contributor License Agreement](https://dev.softgarden.de/opensource/cla).
+
+When commiting, keep all lines to less than 80 characters, and try to
+follow the existing style.
+
+Before creating a pull request, squash your commits into a single commit.
+
+Add the comments where needed, and provide ample explanation in the
+commit message.
+
+
+Report Issues/Bugs
+===============
+[Bugs](https://dev.softgarden.de)
+
+[Questions](http://dev.softgarden.de)

@@ -627,7 +627,7 @@ abstract class BaseSoftgarden {
 	 *
 	 * @return string The response text
 	 */
-	protected function makeRequest($url, $params, $method = 'GET', $accessToken = NULL, $returnHeader = 0) {
+	protected function makeRequest($url, $params, $method = 'GET', $accessToken = NULL, $returnHeader = 0, $contentType = null) {
 		$ch = curl_init();
 
 		$opts = self::$CURL_OPTS;
@@ -651,8 +651,11 @@ abstract class BaseSoftgarden {
 		// for 2 seconds if the server does not support this header.
 		$headers[] = 'Expect:';
 
-		// set the accept header to json
-		$headers[] = "Accept: application/json";
+		// set the accept header to json, if nothing else is requested
+		if (empty ( $contentType )) {
+			$contentType = 'application/json';
+		}
+		$headers[] = "Accept: $contentType";
 		
 		// set the locale for i18n api calls
 		$headers[] = "Accept-Language: " . $this->locale;
@@ -667,7 +670,6 @@ abstract class BaseSoftgarden {
 			}
 			
 		} else if ($method == "JSONPOST") {
-			$params = is_array($params) && empty($params) ? NULL : $params;
 			$json = json_encode($params);
 			$opts[CURLOPT_POSTFIELDS] = $json;
 			$opts[CURLOPT_CUSTOMREQUEST] = "POST";
@@ -675,7 +677,6 @@ abstract class BaseSoftgarden {
 			$headers[] = "Content-Length: " . strlen($json);
 		
 		} else if ($method == "PUT") {
-			$params = is_array($params) && empty($params) ? NULL : $params;
 			$json = json_encode($params);
 			$opts[CURLOPT_POSTFIELDS] = $json;
 			$opts[CURLOPT_CUSTOMREQUEST] = "PUT";
@@ -819,8 +820,8 @@ abstract class BaseSoftgarden {
 		return $this->api($url, $data, 'JSONPOST', $accessToken);
 	}
 	
-	public function get($url, $data = NULL, $accessToken = null) {
-		return $this->api($url, $data, 'GET', $accessToken);
+	public function get($url, $data = NULL, $accessToken = null, $contentType = null) {
+		return $this->api($url, $data, 'GET', $accessToken, 0, $contentType);
 	}
 	
 	public function delete($url, $data = NULL, $accessToken = null) {
@@ -838,18 +839,22 @@ abstract class BaseSoftgarden {
 	 * @return mixed The decoded response object
 	 * @throws SoftgardenApiException
 	 */
-	public function api($path, $params = NULL, $method = 'GET', $accessToken = null, $returnHeader = 0) {
+	public function api($path, $params = NULL, $method = 'GET', $accessToken = null, $returnHeader = 0, $contentType = null) {
 		$paramsAsQueryString = $method == 'GET' || $method == 'DELETE';
 		$url = $this->getUrl($path, $paramsAsQueryString ? $params : NULL);
 		
-		$result = $this->jsonDecode(
-				$this->makeRequest(
+		$result = $this->makeRequest(
 						$url,
 						$params,
 						$method,
 						$accessToken == null ? $this->getAccessToken() : $accessToken,
-						$returnHeader
-				));
+						$returnHeader,
+						$contentType
+				);
+		
+		if ($contentType == null || $contentType == "application/json") {
+			$result = $this->jsonDecode($result);
+		}
 	
 		// results are returned, errors are thrown
 		if (isset($result->error)) {
