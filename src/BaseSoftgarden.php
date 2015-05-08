@@ -98,7 +98,7 @@ abstract class BaseSoftgarden {
 			CURLOPT_CONNECTTIMEOUT => 10,   // The maximum number of seconds to allow cURL to wait for connection establishement
 			CURLOPT_RETURNTRANSFER => true, // Tell curl to write the response to a variable
 			CURLOPT_TIMEOUT        => 60,   // The maximum number of seconds to allow cURL functions to execute.
-			CURLOPT_USERAGENT      => 'softgarden-php-2.0', // add useragent
+			CURLOPT_USERAGENT      => 'softgarden-php-2.1', // add useragent
 
 			// TODO changeme!!! (SNI problem fix?)
 			CURLOPT_SSL_VERIFYHOST	=> 0,
@@ -201,7 +201,7 @@ abstract class BaseSoftgarden {
 		if (isset($config['apiBaseUrl']) && !empty($config['apiBaseUrl'])) {
 			$this->setApiBaseUrl($config['apiBaseUrl']);
 		} else {
-			$this->setApiBaseUrl('https://api.softgarden-cloud.com/api/rest');
+			$this->setApiBaseUrl('https://api.softgarden.io/api/rest');
 		}
 		if (isset($config['fileUpload']) && $config['fileUpload']) {
 			$this->setFileUploadSupport(true);
